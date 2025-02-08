@@ -8,6 +8,9 @@ const app = express();
 
 app.use(express.json());
 
+//we will create all the route and then import the routes
+
+//*is to create the product
 app.post("/api/products", async (req, res) => {
   const product = req.body; //user will send this data
 
@@ -28,6 +31,16 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
+//* we will create a route to delete the route
+app.delete("/api/products/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "Product deleted" });
+  } catch (error) {
+    res.status(404).json({ success: false, message: "Server Error" });
+  }
+});
 app.listen(5030, () => {
   connectDB();
   console.log("server started at port 5030");
