@@ -8,7 +8,7 @@ function App() {
   return (
     <Box minH={"100vh"}>
       <Navbar />
-      {/* ✅ Wrap Routes around Route components */}
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/create" element={<CreatePage />} />
