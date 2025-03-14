@@ -1,12 +1,18 @@
-import { Button, Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { Routes, Route } from "react-router-dom";
+import CreatePage from "./pages/CreatePage";
+import HomePage from "./pages/HomePage";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
-    <Box p={4}>
-      <Text fontSize="xl">Hello, Chakra UI!</Text>
-      <Button colorScheme="blue" mt={4}>
-        Click Me
-      </Button>
+    <Box minH={"100vh"}>
+      <Navbar />
+      {/* ✅ Wrap Routes around Route components */}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/create" element={<CreatePage />} />
+      </Routes>
     </Box>
   );
 }
