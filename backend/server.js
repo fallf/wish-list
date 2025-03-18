@@ -16,10 +16,10 @@ app.use(express.json()); // Allows us to accept JSON data in req.body
 app.use(detailedLogger);
 
 // ✅ Check if `MONGO_URI` is missing and prevent crashes
-// if (!process.env.MONGO_URI) {
-//   console.error("❌ ERROR: MONGO_URI is not defined in the .env file.");
-//   process.exit(1); // Stop the app if the database URI is missing
-// }
+if (!process.env.MONGO_URI) {
+  console.error("❌ ERROR: MONGO_URI is not defined in the .env file.");
+  process.exit(1); // Stop the app if the database URI is missing
+}
 
 app.use("/api/products", productRoutes);
 

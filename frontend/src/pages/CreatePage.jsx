@@ -1,3 +1,4 @@
+import { useProductStore } from "../store/product";
 import {
   Button,
   Container,
@@ -18,8 +19,12 @@ function CreatePage() {
     link: "",
   });
 
-  const handleAddProduct = () => {
-    console.log(newProduct);
+  const { createProduct } = useProductStore();
+
+  const handleAddProduct = async () => {
+    const { success, message } = await createProduct(newProduct);
+    console.log("success:", success);
+    console.log("Message:", message);
   };
 
   return (
