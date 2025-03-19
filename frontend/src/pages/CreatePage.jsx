@@ -7,6 +7,7 @@ import {
   Input,
   useColorModeValue,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import React from "react";
 import { useState } from "react";
@@ -19,12 +20,27 @@ function CreatePage() {
     link: "",
   });
 
+  const toast = useToast();
   const { createProduct } = useProductStore();
 
   const handleAddProduct = async () => {
     const { success, message } = await createProduct(newProduct);
-    console.log("success:", success);
-    console.log("Message:", message);
+    if (!success) {
+      toast({
+        title: "error",
+        description: message,
+        status: "error",
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: message,
+        status: "success",
+        isClosable: true,
+      });
+    }
+    setNewProduct({ name: "", price: "", image: "", link: "" });
   };
 
   return (
@@ -61,7 +77,7 @@ function CreatePage() {
             <Input
               placeholder="Image URL"
               name="image"
-              value={newProduct.imagemage}
+              value={newProduct.image}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, image: e.target.value })
               }
