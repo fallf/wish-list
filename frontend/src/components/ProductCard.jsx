@@ -11,15 +11,27 @@ import {
   Link,
   Button,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  VStack,
+  Input,
+  useDisclosure,
+  ModalContent,
+  ModalFooter,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 
 function ProductCard({ product }) {
+  const [updatedProduct, setUpdatedProduct] = useState(product);
   const textColor = useColorModeValue("gray.600", "gray.200");
   const bg = useColorModeValue("white", "gray.800");
 
-  const { deleteProduct } = useProductStore();
+  const { deleteProduct, updateProduct } = useProductStore();
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleDeleteProduct = async (pid) => {
     const { success, message } = await deleteProduct(pid);
@@ -35,6 +47,28 @@ function ProductCard({ product }) {
       toast({
         title: "Success",
         description: message,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleUpdateProduct = async (pid, updatedData) => {
+    const { success, message } = await updateProduct(pid, updatedData);
+    onClose();
+    if (!success) {
+      toast({
+        title: "Error",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "wish updated successfully",
         status: "success",
         duration: 3000,
         isClosable: true,
@@ -78,7 +112,12 @@ function ProductCard({ product }) {
         </Button>
 
         <HStack spacing={2}>
-          <IconButton icon={<EditIcon />} colorScheme="purple" />
+          <IconButton
+            icon={<EditIcon />}
+            onClick={onOpen}
+            colorScheme="purple"
+          />
+
           <IconButton
             icon={<DeleteIcon />}
             onClick={() => handleDeleteProduct(product._id)}
@@ -86,6 +125,69 @@ function ProductCard({ product }) {
           />
         </HStack>
       </Box>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Update Wish</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <Input
+                placeholder="Wish Name"
+                name="name"
+                value={updatedProduct.name}
+                onChange={(e) =>
+                  setUpdatedProduct({ ...updatedProduct, name: e.target.value })
+                }
+              />
+              <Input
+                placeholder="Price"
+                name="price"
+                type="number"
+                value={updatedProduct.price}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    price: e.target.value,
+                  })
+                }
+              />
+              <Input
+                placeholder="Image URL"
+                name="image"
+                value={updatedProduct.image}
+                onChange={(e) =>
+                  setUpdatedProduct({
+                    ...updatedProduct,
+                    image: e.target.value,
+                  })
+                }
+              />
+              <Input
+                placeholder="Item Link"
+                name="link"
+                value={updatedProduct.link}
+                onChange={(e) =>
+                  setUpdatedProduct({ ...updatedProduct, link: e.target.value })
+                }
+              />
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              colorScheme="pink"
+              mr={3}
+              onClick={() => handleUpdateProduct(product._id, updatedProduct)}
+            >
+              Update
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
