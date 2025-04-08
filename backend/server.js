@@ -1,30 +1,50 @@
 import express from "express";
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+import cors from "cors";
 
 import { connectDB } from "./config/db.js";
 import { requestLogger, detailedLogger } from "./middleware/logger.js";
-
 import productRoutes from "./routes/productRoutes.mjs";
 
+dotenv.config();
+
 const app = express();
-
 const PORT = process.env.PORT || 5032;
-app.use(express.json()); // Allows us to accept JSON data in req.body
+const __dirname = path.resolve();
 
-//mddleware
-app.use(detailedLogger);
+// ✅ Enable CORS BEFORE routes
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://your-frontend-domain.com"], // Replace with your real frontend domain
+    credentials: true,
+  })
+);
 
-// ✅ Check if `MONGO_URI` is missing and prevent crashes
+// ✅ Middleware
+app.use(express.json()); // Accept JSON in requests
+app.use(detailedLogger); // Optional: request logging
+
+// ✅ Check for required environment variable
 if (!process.env.MONGO_URI) {
   console.error("❌ ERROR: MONGO_URI is not defined in the .env file.");
-  process.exit(1); // Stop the app if the database URI is missing
+  process.exit(1); // Prevent server from running without DB
 }
 
+// ✅ API Routes
 app.use("/api/products", productRoutes);
 
-// ✅ Start Server & Connect to MongoDB
+// ✅ Serve frontend if in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
+
+// ✅ Connect to DB and start server
 app.listen(PORT, async () => {
-  await connectDB(process.env.MONGO_URI); // ✅ Pass the variable directly
-  console.log("Server started at http://localhost:" + PORT);
+  await connectDB(process.env.MONGO_URI);
+  console.log(`🚀 Server started at http://localhost:${PORT}`);
 });
