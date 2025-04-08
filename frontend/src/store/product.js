@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 export const useProductStore = create((set) => ({
   products: [],
   setProducts: (products) => set(() => ({ products })),
@@ -10,7 +12,7 @@ export const useProductStore = create((set) => ({
     }
 
     try {
-      const res = await fetch("/api/products", {
+      const res = await fetch(`${API_BASE}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,21 +31,20 @@ export const useProductStore = create((set) => ({
   },
 
   fetchProducts: async () => {
-    const res = await fetch("/api/products");
+    const res = await fetch(`${API_BASE}/api/products`);
     const data = await res.json();
     set({ products: data.data });
   },
 
   deleteProduct: async (pid) => {
     try {
-      const res = await fetch(`/api/products/${pid}`, {
+      const res = await fetch(`${API_BASE}/api/products/${pid}`, {
         method: "DELETE",
       });
       const data = await res.json();
 
       if (!data.success) return { success: false, message: data.message };
 
-      //? update the ui auto
       set((state) => ({
         products: state.products.filter((product) => product._id !== pid),
       }));
@@ -53,11 +54,12 @@ export const useProductStore = create((set) => ({
       return { success: false, message: "Error deleting product" };
     }
   },
+
   updateProduct: async (pid, updateProduct) => {
-    const res = await fetch(`/api/products/${pid}`, {
+    const res = await fetch(`${API_BASE}/api/products/${pid}`, {
       method: "PUT",
       headers: {
-        "content-Type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(updateProduct),
     });
